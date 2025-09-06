@@ -41,6 +41,7 @@ CREATE TABLE recipe_ingredients (
                                      id int GENERATED ALWAYS AS IDENTITY (START WITH 1) NOT NULL,
                                      ingredient_id int  NOT NULL,
                                      recipe_id int  NOT NULL,
+                                     quantity varchar(50)  NOT NULL,
                                      CONSTRAINT recipe_ingredients_pk PRIMARY KEY (id)
 );
 

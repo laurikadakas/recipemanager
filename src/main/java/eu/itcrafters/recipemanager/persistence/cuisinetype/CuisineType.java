@@ -19,6 +19,6 @@ public class CuisineType {
     @Size(max = 50)
     @NotNull
     @Column(name = "TYPE_NAME", nullable = false, length = 50)
-    private String typeName;
+    private String name;
 
 }
