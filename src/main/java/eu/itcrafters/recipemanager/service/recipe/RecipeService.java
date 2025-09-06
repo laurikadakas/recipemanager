@@ -7,6 +7,8 @@ import eu.itcrafters.recipemanager.infrastructure.rest.exception.DataNotFoundExc
 import eu.itcrafters.recipemanager.persistence.cuisinetype.CuisineType;
 import eu.itcrafters.recipemanager.persistence.cuisinetype.CuisineTypeRepository;
 import eu.itcrafters.recipemanager.infrastructure.rest.error.Error;
+import eu.itcrafters.recipemanager.persistence.ingredient.Ingredient;
+import eu.itcrafters.recipemanager.persistence.ingredient.IngredientRepository;
 import eu.itcrafters.recipemanager.persistence.instruction.Instruction;
 import eu.itcrafters.recipemanager.persistence.instruction.InstructionRepository;
 import eu.itcrafters.recipemanager.persistence.recipe.Recipe;
@@ -15,7 +17,6 @@ import eu.itcrafters.recipemanager.persistence.recipe.RecipeRepository;
 import eu.itcrafters.recipemanager.persistence.recipeingredient.RecipeIngredient;
 import eu.itcrafters.recipemanager.persistence.recipeingredient.RecipeIngredientRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final CuisineTypeRepository cuisineTypeRepository;
     private final InstructionRepository instructionRepository;
+    private final IngredientRepository ingredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
 
     @Transactional
@@ -40,13 +42,12 @@ public class RecipeService {
         instruction.setText(recipeDto.getInstructionText());
         instructionRepository.save(instruction);
 
-        Recipe recipe = new Recipe();
+        Recipe recipe = recipeMapper.toRecipe(recipeDto);
         recipe.setCuisineType(cuisineType);
         recipe.setInstruction(instruction);
-        recipe.setRecipeName(recipeDto.getRecipeName());
-        recipe.setDateAdded(recipeDto.getDateAdded());
-        recipe.setDescription(recipeDto.getDescription());
         recipeRepository.save(recipe);
+
+        saveRecipeIngredientsFromIngredientList(recipe, recipeDto.getIngredientList());
 
     }
 
@@ -66,6 +67,24 @@ public class RecipeService {
             recipeInfo.setIngredientList(findRecipeIngredients(recipeInfo.getRecipeId()));
         }
         return recipeInfos;
+    }
+
+    @Transactional
+    public void updateRecipe(int recipeId, RecipeDto recipeDto) {
+        Recipe recipe = getValidRecipe(recipeId);
+        CuisineType cuisineType = getValidCuisineType(recipeDto.getCuisineTypeName());
+        recipeMapper.updateRecipe(recipeDto, recipe);
+        recipe.setCuisineType(cuisineType);
+
+        Instruction instruction = new Instruction();
+        instruction.setText(recipeDto.getInstructionText());
+        instructionRepository.save(instruction);
+        recipe.setInstruction(instruction);
+
+        recipeRepository.save(recipe);
+        resetRecipeIngredients(recipeId);
+        saveRecipeIngredientsFromIngredientList(recipe, recipeDto.getIngredientList());
+
     }
 
     private CuisineType getValidCuisineType(String cuisineTypeName) {
@@ -96,4 +115,27 @@ public class RecipeService {
         }
         return ingredients;
     }
+
+    private void saveRecipeIngredientsFromIngredientList(Recipe recipe, List<IngredientDto> ingredientList) {
+        for(IngredientDto ingredientDto : ingredientList) {
+            Ingredient ingredient = new Ingredient();
+            ingredient.setIngredientName(ingredientDto.getIngredientName());
+            if (!ingredientRepository.existsByIngredientName(ingredientDto.getIngredientName())) {
+                ingredientRepository.save(ingredient);
+            }
+
+            RecipeIngredient recipeIngredient = new RecipeIngredient();
+            recipeIngredient.setRecipe(recipe);
+            recipeIngredient.setIngredient(ingredientRepository.findByIngredientName(ingredientDto.getIngredientName()));
+            recipeIngredient.setQuantity(ingredientDto.getQuantity());
+
+            recipeIngredientRepository.save(recipeIngredient);
+        }
+    }
+
+    private void resetRecipeIngredients(int recipeId) {
+        recipeIngredientRepository.deleteAllByRecipeId(recipeId);
+
+    }
+
 }

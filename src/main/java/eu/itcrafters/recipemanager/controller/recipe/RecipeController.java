@@ -52,4 +52,17 @@ public class RecipeController {
         return recipeService.findAllRecipes();
     }
 
+    @PutMapping("/recipe/{recipeId}")
+    @Operation(summary = "Updates a recipe by ID", description = "If there are any null values, then they won't get updated.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body: payload validation failed",
+                    content = @Content(schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "404", description = "Recipe / CuisineType does not exist",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
+    public void updateRecipe(@PathVariable Integer recipeId, @RequestBody @Valid RecipeDto recipeDto) {
+        recipeService.updateRecipe(recipeId, recipeDto);
+    }
+
 }

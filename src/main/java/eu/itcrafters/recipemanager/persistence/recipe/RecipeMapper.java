@@ -21,4 +21,13 @@ public interface RecipeMapper {
     RecipeInfo toRecipeInfo(Recipe recipe);
 
     List<RecipeInfo> toRecipeInfos(List<Recipe> recipes);
+
+    @Mapping(source = "recipeName", target = "recipeName")
+    @Mapping(source = "dateAdded", target = "dateAdded")
+    @Mapping(source = "description", target = "description")
+    Recipe toRecipe(RecipeDto recipeDto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @InheritConfiguration(name = "toRecipe")
+    void updateRecipe(RecipeDto recipeDto, @MappingTarget Recipe recipe);
 }

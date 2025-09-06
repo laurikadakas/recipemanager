@@ -2,6 +2,7 @@ package eu.itcrafters.recipemanager.persistence.recipe;
 
 import eu.itcrafters.recipemanager.persistence.cuisinetype.CuisineType;
 import eu.itcrafters.recipemanager.persistence.instruction.Instruction;
+import eu.itcrafters.recipemanager.persistence.recipeingredient.RecipeIngredient;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -9,6 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -43,5 +46,8 @@ public class Recipe {
     @NotNull
     @Column(name = "DESCRIPTION", nullable = false)
     private String description;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeIngredient> ingredients = new ArrayList<>();
 
 }
