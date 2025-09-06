@@ -19,6 +19,7 @@ import eu.itcrafters.recipemanager.persistence.recipeingredient.RecipeIngredient
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +122,11 @@ public class RecipeService {
     }
 
     private void saveRecipeIngredientsFromIngredientList(Recipe recipe, List<IngredientDto> ingredientList) {
+        if (ingredientList.isEmpty()) {
+            throw new DataNotFoundException(Error.NO_INGREDIENT_LIST_FOUND.getMessage());
+        }
         for (IngredientDto ingredientDto : ingredientList) {
+            validateIngredientDto(ingredientDto);
             Ingredient ingredient = new Ingredient();
             ingredient.setIngredientName(ingredientDto.getIngredientName());
             if (!ingredientRepository.existsByIngredientName(ingredientDto.getIngredientName())) {
@@ -134,6 +139,12 @@ public class RecipeService {
             recipeIngredient.setQuantity(ingredientDto.getQuantity());
 
             recipeIngredientRepository.save(recipeIngredient);
+        }
+    }
+
+    private static void validateIngredientDto(IngredientDto ingredientDto) {
+        if (!StringUtils.hasLength(ingredientDto.getIngredientName()) || !StringUtils.hasLength(ingredientDto.getQuantity())) {
+            throw new DataNotFoundException(Error.NO_INGREDIENT_FOUND.getMessage());
         }
     }
 

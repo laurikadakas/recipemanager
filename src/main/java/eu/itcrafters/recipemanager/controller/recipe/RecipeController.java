@@ -22,12 +22,14 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @PostMapping("/recipe")
-    @Operation(summary = "Add a new recipe", description = "Adds a new recipe, throws an error if stated CuisineType is not found")
+    @Operation(summary = "Add a new recipe", description = "Adds a new recipe, throws an error if stated CuisineType is not found. " +
+            "If a new ingredient is provided, it will also be added. " +
+            "Currently available cuisine types are: French, Italian, Chinese.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Invalid request body: payload validation failed",
                     content = @Content(schema = @Schema(implementation = ApiError.class))),
-            @ApiResponse(responseCode = "404", description = "CuisineType does not exist",
+            @ApiResponse(responseCode = "404", description = "CuisineType does not exist, or ingredient / ingredientList was empty/null",
                     content = @Content(schema = @Schema(implementation = ApiError.class)))
     })
     public void addRecipe(@RequestBody @Valid RecipeDto recipeDto) {
@@ -52,12 +54,14 @@ public class RecipeController {
     }
 
     @PutMapping("/recipe/{recipeId}")
-    @Operation(summary = "Updates a recipe by ID", description = "If there are any null values, then they won't get updated.")
+    @Operation(summary = "Updates a recipe by ID", description = "If there are any null values, then they won't get updated. " +
+            "If a new ingredient is provided, it will be added to the database. " +
+            "Currently available cuisine types: French, Italian, Chinese")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "400", description = "Invalid request body: payload validation failed",
                     content = @Content(schema = @Schema(implementation = ApiError.class))),
-            @ApiResponse(responseCode = "404", description = "Recipe / CuisineType does not exist",
+            @ApiResponse(responseCode = "404", description = "Recipe / CuisineType does not exist, or ingredient / ingredientList was empty/null",
                     content = @Content(schema = @Schema(implementation = ApiError.class)))
     })
     public void updateRecipe(@PathVariable Integer recipeId, @RequestBody @Valid RecipeDto recipeDto) {
