@@ -34,7 +34,6 @@ public class RecipeController {
         recipeService.addRecipe(recipeDto);
     }
 
-
     @GetMapping("/recipe/{recipeId}")
     @Operation(summary = "Finds a recipe by ID", description = "Finds a recipe by ID, throws an error if no match is found")
     @ApiResponses(value = {
@@ -75,5 +74,4 @@ public class RecipeController {
     public void deleteRecipe(@PathVariable Integer recipeId) {
         recipeService.deleteRecipe(recipeId);
     }
-
 }

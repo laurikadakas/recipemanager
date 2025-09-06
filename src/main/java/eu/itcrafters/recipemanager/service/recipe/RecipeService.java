@@ -3,10 +3,10 @@ package eu.itcrafters.recipemanager.service.recipe;
 import eu.itcrafters.recipemanager.controller.ingredient.dto.IngredientDto;
 import eu.itcrafters.recipemanager.controller.recipe.dto.RecipeDto;
 import eu.itcrafters.recipemanager.controller.recipe.dto.RecipeInfo;
+import eu.itcrafters.recipemanager.infrastructure.rest.error.Error;
 import eu.itcrafters.recipemanager.infrastructure.rest.exception.DataNotFoundException;
 import eu.itcrafters.recipemanager.persistence.cuisinetype.CuisineType;
 import eu.itcrafters.recipemanager.persistence.cuisinetype.CuisineTypeRepository;
-import eu.itcrafters.recipemanager.infrastructure.rest.error.Error;
 import eu.itcrafters.recipemanager.persistence.ingredient.Ingredient;
 import eu.itcrafters.recipemanager.persistence.ingredient.IngredientRepository;
 import eu.itcrafters.recipemanager.persistence.instruction.Instruction;
@@ -48,7 +48,6 @@ public class RecipeService {
         recipeRepository.save(recipe);
 
         saveRecipeIngredientsFromIngredientList(recipe, recipeDto.getIngredientList());
-
     }
 
     public RecipeDto findRecipe(int recipeId) {
@@ -84,7 +83,6 @@ public class RecipeService {
         recipeRepository.save(recipe);
         resetRecipeIngredients(recipeId);
         saveRecipeIngredientsFromIngredientList(recipe, recipeDto.getIngredientList());
-
     }
 
     @Transactional
@@ -111,7 +109,7 @@ public class RecipeService {
         List<RecipeIngredient> recipeIngredients = recipeIngredientRepository.findAll();
         List<IngredientDto> ingredients = new ArrayList<>();
 
-        for(RecipeIngredient recipeIngredient:recipeIngredients) {
+        for (RecipeIngredient recipeIngredient : recipeIngredients) {
             if (recipeIngredient.getRecipe().getId().equals(recipeId)) {
                 IngredientDto ingredientDto = new IngredientDto();
                 ingredientDto.setIngredientName(recipeIngredient.getIngredient().getIngredientName());
@@ -123,7 +121,7 @@ public class RecipeService {
     }
 
     private void saveRecipeIngredientsFromIngredientList(Recipe recipe, List<IngredientDto> ingredientList) {
-        for(IngredientDto ingredientDto : ingredientList) {
+        for (IngredientDto ingredientDto : ingredientList) {
             Ingredient ingredient = new Ingredient();
             ingredient.setIngredientName(ingredientDto.getIngredientName());
             if (!ingredientRepository.existsByIngredientName(ingredientDto.getIngredientName())) {
@@ -141,6 +139,5 @@ public class RecipeService {
 
     private void resetRecipeIngredients(int recipeId) {
         recipeIngredientRepository.deleteAllByRecipeId(recipeId);
-
     }
 }
