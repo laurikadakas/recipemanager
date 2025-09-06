@@ -65,4 +65,15 @@ public class RecipeController {
         recipeService.updateRecipe(recipeId, recipeDto);
     }
 
+    @DeleteMapping("/recipe/{recipeId}")
+    @Operation(summary = "Deletes a recipe by ID", description = "Also deletes any corresponding recipe's ingredients.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Recipe does not exist",
+                    content = @Content(schema = @Schema(implementation = ApiError.class)))
+    })
+    public void deleteRecipe(@PathVariable Integer recipeId) {
+        recipeService.deleteRecipe(recipeId);
+    }
+
 }

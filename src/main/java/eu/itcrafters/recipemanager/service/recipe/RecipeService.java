@@ -87,6 +87,12 @@ public class RecipeService {
 
     }
 
+    @Transactional
+    public void deleteRecipe(Integer recipeId) {
+        Recipe recipe = getValidRecipe(recipeId);
+        recipeRepository.deleteById(recipe.getId());
+    }
+
     private CuisineType getValidCuisineType(String cuisineTypeName) {
         return cuisineTypeRepository.findCuisineTypeBy(cuisineTypeName)
                 .orElseThrow(() -> new DataNotFoundException(Error.NO_CUISINE_TYPE_EXISTS.getMessage()));
@@ -137,5 +143,4 @@ public class RecipeService {
         recipeIngredientRepository.deleteAllByRecipeId(recipeId);
 
     }
-
 }
